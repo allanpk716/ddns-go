@@ -117,7 +117,7 @@ func RunOnce() {
 	// 需要开启 frps 以及 frpc
 	nowdir, _ := os.Getwd()
 	if initOk := util.InitFrpArgs(nowdir, oneJob_s, oneJob_c); initOk == false {
-		log.Fatalf("InitFrpArgs Error.")
+		log.Println("InitFrpArgs Error.")
 		return
 	}
 
@@ -128,7 +128,7 @@ func RunOnce() {
 	} else {
 		// 非第一次
 		if tmpDomains.Ipv4Addr == "" {
-			log.Fatalf("Try to query Ipv4Addr Error.")
+			log.Println("Try to query Ipv4Addr Error.")
 			return
 		}
 		queryIPv4 = tmpDomains.Ipv4Addr
