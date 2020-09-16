@@ -4,7 +4,6 @@ import (
 	"ddns-go/config"
 	"ddns-go/dns"
 	"ddns-go/static"
-	"ddns-go/util"
 	"ddns-go/web"
 	"log"
 	"net/http"
@@ -23,7 +22,7 @@ func main() {
 	http.HandleFunc("/logs", config.BasicAuth(web.Logs))
 
 	// 打开浏览器
-	go util.OpenExplorer("http://127.0.0.1:" + port)
+	// go util.OpenExplorer("http://127.0.0.1:" + port)
 	log.Println("启动端口", port, "...")
 
 	// 定时运行
@@ -35,5 +34,4 @@ func main() {
 		log.Println("启动端口发生异常, 1分钟后自动关闭此窗口", err)
 		time.Sleep(time.Minute)
 	}
-
 }

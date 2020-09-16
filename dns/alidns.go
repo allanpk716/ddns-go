@@ -14,7 +14,7 @@ type Alidns struct {
 }
 
 // Init 初始化
-func (ali *Alidns) Init(conf *config.Config) {
+func (ali *Alidns) Init(conf *config.Config) Domains {
 	client, err := alidnssdk.NewClientWithAccessKey("cn-hangzhou", conf.DNS.ID, conf.DNS.Secret)
 	if err != nil {
 		log.Println("Alidns链接失败")
@@ -23,6 +23,7 @@ func (ali *Alidns) Init(conf *config.Config) {
 
 	ali.Domains.ParseDomain(conf)
 
+	return ali.Domains
 }
 
 // AddUpdateIpv4DomainRecords 添加或更新IPV4记录

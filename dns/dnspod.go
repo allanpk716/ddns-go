@@ -41,9 +41,10 @@ type DnspodStatus struct {
 }
 
 // Init 初始化
-func (dnspod *Dnspod) Init(conf *config.Config) {
+func (dnspod *Dnspod) Init(conf *config.Config) Domains {
 	dnspod.DNSConfig = conf.DNS
 	dnspod.Domains.ParseDomain(conf)
+	return dnspod.Domains
 }
 
 // AddUpdateIpv4DomainRecords 添加或更新IPV4记录

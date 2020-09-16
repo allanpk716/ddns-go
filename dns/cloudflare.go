@@ -55,9 +55,10 @@ type CloudflareStatus struct {
 }
 
 // Init 初始化
-func (cf *Cloudflare) Init(conf *config.Config) {
+func (cf *Cloudflare) Init(conf *config.Config) Domains {
 	cf.DNSConfig = conf.DNS
 	cf.Domains.ParseDomain(conf)
+	return cf.Domains
 }
 
 // AddUpdateIpv4DomainRecords 添加或更新IPV4记录

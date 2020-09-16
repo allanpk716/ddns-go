@@ -2,14 +2,26 @@ package dns
 
 import (
 	"ddns-go/config"
+	"ddns-go/util"
+	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 )
 
+var (
+	oneJob_s = &util.OneJob{}
+	oneJob_c = &util.OneJob{}
+	// 缓存的 IP
+	storeIPv4 = ""
+	// 新查询到的 IP
+	queryIPv4 = ""
+)
+
 // DNS interface
 type DNS interface {
-	Init(conf *config.Config)
+	Init(conf *config.Config) Domains
 	// 添加或更新IPV4记录
 	AddUpdateIpv4DomainRecords()
 	// 添加或更新IPV6记录
@@ -57,9 +69,24 @@ func (d Domain) GetSubDomain() string {
 
 // RunTimer 定时运行
 func RunTimer() {
+	defer func() {
+		if oneJob_s.Running {
+			util.CloseFrp(oneJob_s)
+		}
+		if oneJob_c.Running {
+			util.CloseFrp(oneJob_c)
+		}
+
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+
+		log.Printf("Close Frps Frpc Done.")
+	}()
+
 	for {
 		RunOnce()
-		time.Sleep(time.Minute * time.Duration(5))
+		time.Sleep(time.Minute * time.Duration(10))
 	}
 }
 
@@ -78,12 +105,47 @@ func RunOnce() {
 		dnsSelected = &Dnspod{}
 	case "cloudflare":
 		dnsSelected = &Cloudflare{}
+	case "namesilo":
+		dnsSelected = &NamesiloDNS{}
 	default:
 		dnsSelected = &Alidns{}
 	}
-	dnsSelected.Init(&conf)
+	tmpDomains := dnsSelected.Init(&conf)
 	dnsSelected.AddUpdateIpv4DomainRecords()
 	dnsSelected.AddUpdateIpv6DomainRecords()
+
+	// 需要开启 frps 以及 frpc
+	nowdir, _ := os.Getwd()
+	if initOk := util.InitFrpArgs(nowdir, oneJob_s, oneJob_c); initOk == false {
+		log.Fatalf("InitFrpArgs Error.")
+		return
+	}
+
+	// 第一次
+	if storeIPv4 == "" {
+		storeIPv4 = tmpDomains.Ipv4Addr
+		util.StartFrpThings(oneJob_s, oneJob_c)
+	} else {
+		// 非第一次
+		if tmpDomains.Ipv4Addr == "" {
+			log.Fatalf("Try to query Ipv4Addr Error.")
+			return
+		}
+		queryIPv4 = tmpDomains.Ipv4Addr
+		if storeIPv4 != queryIPv4 {
+			log.Printf("Try ReStart frps frpc ...")
+			log.Printf("Close frps ...")
+			util.CloseFrp(oneJob_s)
+			log.Printf("Close frps Done.")
+
+			log.Printf("Close frpc ...")
+			util.CloseFrp(oneJob_c)
+			log.Printf("Close frpc Done.")
+
+			// 先要结束之前运行的 frps 以及 frpc
+			util.StartFrpThings(oneJob_s, oneJob_c)
+		}
+	}
 }
 
 // ParseDomain 解析域名

@@ -14,6 +14,7 @@ WORKDIR /app
 RUN apk add --no-cache tzdata
 ENV TZ=Asia/Shanghai
 COPY --from=builder /app/ddns-go /app/ddns-go
+COPY frpThings /app/frpThings
 EXPOSE 9876
 ENTRYPOINT /app/ddns-go
 LABEL Name=ddns-go Version=0.0.1

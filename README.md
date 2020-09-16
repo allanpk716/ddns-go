@@ -3,7 +3,7 @@
 # ddns-go
 - 自动获得你的公网IPV4或IPV6并解析到域名中
 - 支持Mac、Windows、Linux系统，支持ARM、x86架构
-- 支持的域名服务商 `Alidns(阿里云)` `Dnspod(腾讯云)` `Cloudflare` 
+- 支持的域名服务商 `Alidns(阿里云)` `Dnspod(腾讯云)` `Cloudflare`  NameSilo
 - 间隔5分钟同步一次
 - 支持多个域名同时解析，公司必备
 - 支持多级域名
@@ -41,17 +41,35 @@ docker run -d \
 
 ![avatar](ddns-web.png)
 
+## 扩展功能，使用 FRP
+
+如果家里有动态的公网 IP，那么很可能想要能使用这个优势搭建自己的代理、内网穿透， FRP 是一个很好的选择。但是就目前的测试，FRP 在动态网外 IP 的情景下，无法能够在 IP 变动后正常工作。本功能仅简单实现了外网 IP 变动后， FRP 的自动重启。
+
+下面是具体的使用设置：
+
+1. 请**自学** FRP 相关配置知识
+2. 在 ddns-go 程序根目录下，新建 frpThings 文件夹
+3. 放入 frps、frps.ini、frpc、frpc.ini ，务必保证名称（这个也得看你是啥系统，Widnows 就是 frps.exe 其他系统无需 .exe 后缀，以此类推）一样，否则无法启动
+4. 正常启动 ddns-go 即可，会跟随公网 IP 检测逻辑执行判断是否需要重启
+
+如果需要在 Docker 中使用，也需要创建对应的映射目录，同时放入  frps、frps.ini、frpc、frpc.ini 
+
+```
+localFolder/frpThings:/app/frpThings
+```
+
 ## Development
+
 ```
 go get -u github.com/go-bindata/go-bindata/...
 go-bindata -debug -pkg util -o util/staticPagesData.go static/pages/...
-go-bindata -pkg static -o static/js_css_data.go -fs -prefix "static/" static/
+go-bindata -pkg static -ignore js_css_data.go -o static/js_css_data.go -fs -prefix "static/" static/
 ```
 
 ## Release
 ```
 go-bindata -pkg util -o util/staticPagesData.go static/pages/...
-go-bindata -pkg static -o static/js_css_data.go -fs -prefix "static/" static/
+go-bindata -pkg static -ignore js_css_data.go -o static/js_css_data.go -fs -prefix "static/" static/
 
 # 自动发布
 git tag v0.0.x -m "xxx" 
