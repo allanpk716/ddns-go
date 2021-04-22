@@ -26,7 +26,7 @@ func BasicAuth(f ViewFunc) ViewFunc {
 			f(w, r)
 			return
 		}
-
+		GlobalConfig = conf
 		// 认证帐号密码
 		basicAuthPrefix := "Basic "
 

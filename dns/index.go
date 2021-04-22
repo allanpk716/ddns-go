@@ -92,10 +92,7 @@ func RunTimer() {
 
 // RunOnce RunOnce
 func RunOnce() {
-	conf, err := config.GetConfigCache()
-	if err != nil {
-		return
-	}
+	conf := config.GlobalConfig
 
 	var dnsSelected DNS
 	switch conf.DNS.Name {

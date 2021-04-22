@@ -27,6 +27,7 @@ func Writing(writer http.ResponseWriter, request *http.Request) {
 
 	conf, err := config.GetConfigCache()
 	if err == nil {
+		config.GlobalConfig = conf
 		// 已存在配置文件，隐藏真实的ID、Secret
 		idHide, secretHide := getHideIDSecret(&conf)
 		conf.DNS.ID = idHide

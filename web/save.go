@@ -11,7 +11,7 @@ import (
 func Save(writer http.ResponseWriter, request *http.Request) {
 
 	conf, _ := config.GetConfigCache()
-
+	config.GlobalConfig = conf
 	idNew := request.FormValue("DnsID")
 	secretNew := request.FormValue("DnsSecret")
 

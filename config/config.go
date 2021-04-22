@@ -50,6 +50,8 @@ type cacheType struct {
 
 var cache = &cacheType{}
 
+var GlobalConfig Config
+
 // GetConfigCache 获得配置
 func GetConfigCache() (conf Config, err error) {
 
