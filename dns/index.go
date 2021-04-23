@@ -110,7 +110,8 @@ func RunOnce() {
 	tmpDomains := dnsSelected.Init(&conf)
 	dnsSelected.AddUpdateIpv4DomainRecords()
 	dnsSelected.AddUpdateIpv6DomainRecords()
-
+	// 获取到的外网 IP
+	log.Println("获取到外网的 IP:", tmpDomains.Ipv4Addr)
 	// 需要开启 frps 以及 frpc
 	nowdir, _ := os.Getwd()
 	if initOk := util.InitFrpArgs(nowdir, oneJob_s, oneJob_c); initOk == false {
@@ -120,7 +121,13 @@ func RunOnce() {
 
 	// 第一次
 	if storeIPv4 == "" {
+		log.Printf("第一次启动 ...")
 		storeIPv4 = tmpDomains.Ipv4Addr
+		if storeIPv4 == "" {
+			log.Println("没有获取到外网 IP")
+			return
+		}
+		log.Println("外网IP:", storeIPv4)
 		util.StartFrpThings(oneJob_s, oneJob_c)
 	} else {
 		// 非第一次
@@ -128,6 +135,8 @@ func RunOnce() {
 			log.Println("Try to query Ipv4Addr Error.")
 			return
 		}
+		log.Println("原外网IP:", storeIPv4)
+		log.Println("现外网IP:", queryIPv4)
 		queryIPv4 = tmpDomains.Ipv4Addr
 		if storeIPv4 != queryIPv4 {
 			log.Printf("Try ReStart frps frpc ...")
@@ -139,6 +148,8 @@ func RunOnce() {
 			util.CloseFrp(oneJob_c)
 			log.Printf("Close frpc Done.")
 
+			// 重新更新缓存的 IP 地址
+			storeIPv4 = queryIPv4
 			// 先要结束之前运行的 frps 以及 frpc
 			util.StartFrpThings(oneJob_s, oneJob_c)
 		}

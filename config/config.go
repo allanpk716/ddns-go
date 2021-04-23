@@ -86,6 +86,8 @@ func GetConfigCache() (conf Config, err error) {
 		cache.Err = err
 		return *cache.ConfigSingle, err
 	}
+	// 缓存全局设置信息
+	GlobalConfig = *cache.ConfigSingle
 	// remove err
 	cache.Err = nil
 	return *cache.ConfigSingle, err

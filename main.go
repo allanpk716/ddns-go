@@ -25,6 +25,9 @@ func main() {
 	// go util.OpenExplorer("http://127.0.0.1:" + port)
 	log.Println("启动端口", port, "...")
 
+	// 提前读取一次
+	config.GetConfigCache()
+
 	// 定时运行
 	go dns.RunTimer()
 

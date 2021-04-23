@@ -17,4 +17,4 @@ COPY --from=builder /app/ddns-go /app/ddns-go
 COPY frpThings /app/frpThings
 EXPOSE 9876
 ENTRYPOINT /app/ddns-go
-LABEL Name=ddns-go Version=0.0.3
+LABEL Name=ddns-go Version=0.0.6
